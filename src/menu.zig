@@ -28,7 +28,7 @@ const menu_labels = [_]MenuLabel{
 
 pub const Menu = struct {
     selected_option: usize,
-    startGame: *const fn (g: *game.Game) void,
+    startGame: ?*const fn (g: *game.Game) void,
 
     pub fn draw(self: Menu) !void {
         self.draw_bg();
@@ -57,7 +57,9 @@ pub const Menu = struct {
             switch (selected_menu_option) {
                 .Start => {
                     std.debug.print("Starting game...\n", .{});
-                    self.startGame(g);
+                    if (self.startGame) |startFn| {
+                        startFn(g);
+                    }
                 },
                 .Quit => {
                     std.debug.print("Quitting game...\n", .{});

@@ -22,5 +22,5 @@ pub const Enemy = struct {
     shape: ShapeEnemy,
     attributes: character.CharacterAttributes,
     position: rl.Vector2 = .{ .x = 0, .y = 0 },
-    translate: rl.Vector2 = .{ .x = 0, .y = 0 },
+    transform: rl.Vector2 = .{ .x = 0, .y = 0 },
 };

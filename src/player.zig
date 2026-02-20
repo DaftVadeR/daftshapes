@@ -119,7 +119,7 @@ pub const Player = struct {
     //     };
     // }
 
-    pub fn draw(self: *Player) void {
+    pub fn draw(self: Player) void {
         self.player_detail.attributes.anims[self.player_detail.attributes.default_anim].draw(
             self.player_detail.attributes.position,
             5.0,

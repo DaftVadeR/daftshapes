@@ -14,7 +14,7 @@ pub const Game = struct {
     state: GameState,
     allocator: std.mem.Allocator,
     menu: menu.Menu,
-    gameplay: gameplay.GamePlay,
+    gameplay: ?gameplay.GamePlay,
 
     // other fields...
 
@@ -23,17 +23,16 @@ pub const Game = struct {
 
         // this assumes the menu is always first to show - this isnt ideal for flexibility.
         self.* = .{
-            .gameplay = undefined,
+            .gameplay = null,
             .state = .Menu,
             .allocator = allocator,
             .menu = menu.Menu{
                 .selected_option = 0,
-                .startGame = undefined,
+                .startGame = null,
             },
         };
 
         self.menu.startGame = &Game.start;
-        self.gameplay.exitToMenu = &Game.exitToMenu;
 
         // init child resources here, e.g:
         // self.player = try Player.init(allocator);
@@ -42,20 +41,18 @@ pub const Game = struct {
 
     pub fn start(self: *Game) void {
         self.gameplay = gameplay.GamePlay.init(self.allocator, self, &Game.exitToMenu) catch unreachable;
-
         self.state = .Play;
     }
 
     pub fn exitToMenu(self: *Game) void {
-        // self.gameplay.deinit();
-
         self.state = .Menu;
     }
 
     pub fn deinit(self: *Game) void {
         // deinit children first, then self
-        self.gameplay.deinit();
-        // self.menu.deinit();
+        if (self.gameplay) |*gp| {
+            gp.deinit();
+        }
         self.allocator.destroy(self);
     }
 
@@ -63,7 +60,9 @@ pub const Game = struct {
         if (self.state == .Menu) {
             try self.menu.draw();
         } else if (self.state == .Play) {
-            self.gameplay.draw();
+            if (self.gameplay) |*gp| {
+                gp.draw();
+            }
         }
     }
 
@@ -71,7 +70,9 @@ pub const Game = struct {
         if (self.state == .Menu) {
             self.menu.update(self);
         } else if (self.state == .Play) {
-            self.gameplay.update(self);
+            if (self.gameplay) |*gp| {
+                gp.update(self);
+            }
         }
     }
 };

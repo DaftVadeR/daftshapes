@@ -37,8 +37,6 @@ pub fn main() anyerror!void {
 
     var g = try game.Game.init(allocatorBase);
 
-    defer g.deinit();
-
     var closed_ingame: bool = false;
 
     while (!rl.windowShouldClose()) { // detect external close requests
@@ -58,7 +56,8 @@ pub fn main() anyerror!void {
         try g.draw();
     }
 
-    _ = dba.detectLeaks();
+    // free GPU resources before closing the window (needs OpenGL context alive)
+    g.deinit();
 
     if (!closed_ingame) { // if closed externally (window closed, raylib escape key, alt F4 etc.)
         rl.closeWindow();
