@@ -41,26 +41,56 @@ pub const Menu = struct {
                 color = rl.Color.gold;
             }
 
-            rl.drawText(menu_name_z, common.desiredScreenWidth / 2 - 20, 20 * (index_int + 1), 8, color);
+            const increment: i32 = 50;
+            const font_size: i32 = 100;
+
+            const text_dimensions = rl.measureTextEx(
+                try rl.getFontDefault(),
+                menu_name_z,
+                font_size,
+                0,
+            );
+
+            const text_dimensions_x_i32: i32 = @intFromFloat(text_dimensions.x);
+            const text_dimensions_y_i32: i32 = @intFromFloat(text_dimensions.y);
+
+            const half_x: i32 = @intFromFloat(@divTrunc(text_dimensions.x, 2));
+
+            std.debug.print("text_dimensions: {d}, {d}\n", .{ text_dimensions_x_i32, text_dimensions_y_i32 });
+
+            const length: i32 = @intCast(menu_labels.len);
+            const height_of_all_text: i32 = @intCast((increment * index_int) + (text_dimensions_y_i32 * length));
+
+            // const line_pos_y: i32 = height_of_all_text;
+            const y = common.desiredScreenHeight / 2 - @divTrunc(height_of_all_text, 2) + (increment * index_int) + ((index_int) * text_dimensions_y_i32);
+
+            rl.drawText(
+                menu_name_z,
+                @intCast(common.desiredScreenWidth / 2 - half_x),
+                @intCast(y),
+                font_size,
+                color,
+            );
         }
     }
 
     pub fn update(self: *Menu, g: *game.Game) void {
         if (rl.isKeyPressed(rl.KeyboardKey.up)) {
+            std.debug.print("up...\n", .{});
             if (self.selected_option > 0) {
                 self.selected_option -= 1;
             } else {
                 self.selected_option = menu_labels.len - 1;
             }
         } else if (rl.isKeyPressed(rl.KeyboardKey.down)) {
+            std.debug.print("doown...\n", .{});
             if (self.selected_option < menu_labels.len - 1) {
                 self.selected_option += 1;
             } else {
                 self.selected_option = 0;
             }
-        }
-
-        if (rl.isKeyDown(rl.KeyboardKey.enter)) {
+        } else if (rl.isKeyPressed(rl.KeyboardKey.enter)) {
+            std.debug.print("enter...\n", .{});
             const selected_menu_option = menu_labels[self.selected_option].option;
 
             switch (selected_menu_option) {

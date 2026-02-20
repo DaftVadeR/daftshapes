@@ -53,7 +53,7 @@ pub const Game = struct {
     pub fn draw(self: *Game) !void {
         if (self.state == .Menu) {
             // rl.drawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: Color)
-            rl.drawText("Hello Menu", 50, 50, 8, rl.Color.purple);
+            // rl.drawText("Hello Menu", 50, 50, 8, rl.Color.purple);
             try self.menu.draw();
         } else if (self.state == .Play) {
             rl.drawText("Hello Game", 50, 50, 8, rl.Color.red);
