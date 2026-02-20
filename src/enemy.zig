@@ -20,8 +20,7 @@ pub const ShapeEnemy = union(enum) {
 
 pub const Enemy = struct {
     shape: ShapeEnemy,
-    sprite: sprite.Sprite,
-
-    position: rl.Vector2(0, 0),
-    translate: rl.Vector2(0, 0),
+    attributes: character.CharacterAttributes,
+    position: rl.Vector2 = .{ .x = 0, .y = 0 },
+    translate: rl.Vector2 = .{ .x = 0, .y = 0 },
 };

@@ -41,7 +41,8 @@ pub const Game = struct {
     }
 
     pub fn start(self: *Game) void {
-        self.gameplay = gameplay.GamePlay.init(&Game.exitToMenu) catch unreachable;
+        self.gameplay = gameplay.GamePlay.init(self.allocator, self, &Game.exitToMenu) catch unreachable;
+
         self.state = .Play;
     }
 
@@ -53,17 +54,16 @@ pub const Game = struct {
 
     pub fn deinit(self: *Game) void {
         // deinit children first, then self
-        // self.player.deinit();
+        self.gameplay.deinit();
+        // self.menu.deinit();
         self.allocator.destroy(self);
     }
 
     pub fn draw(self: *Game) !void {
         if (self.state == .Menu) {
-            // rl.drawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: Color)
-            // rl.drawText("Hello Menu", 50, 50, 8, rl.Color.purple);
             try self.menu.draw();
         } else if (self.state == .Play) {
-            rl.drawText("Hello Game", 50, 50, 8, rl.Color.red);
+            self.gameplay.draw();
         }
     }
 

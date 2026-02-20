@@ -25,14 +25,15 @@ pub fn main() anyerror!void {
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     var dba: std.heap.DebugAllocator(.{}) = .init;
+
+    defer _ = dba.deinit();
+
     const allocatorBase = dba.allocator();
 
     // use page allocator later as base, with arena on top
     // var arena = std.heap.ArenaAllocator.init(allocatorBase);
     // const allocator = arena.allocator();
     // defer allocator.deinit();
-
-    defer _ = dba.deinit();
 
     var g = try game.Game.init(allocatorBase);
 
@@ -56,6 +57,8 @@ pub fn main() anyerror!void {
 
         try g.draw();
     }
+
+    _ = dba.detectLeaks();
 
     if (!closed_ingame) { // if closed externally (window closed, raylib escape key, alt F4 etc.)
         rl.closeWindow();

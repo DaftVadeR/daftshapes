@@ -1,11 +1,20 @@
 const std = @import("std");
 const rl = @import("raylib");
 
+// deprecated
 pub const Sprite = struct {
     texture: rl.Texture2D,
     name: []const u8,
-    position: rl.Vector2,
-    translate: rl.Vector2,
+
+    // size to render each texture rectangle
+    // squareSize: usize,
+    //
+    // // how big rectangles are in the source image
+    // sourceSquareSize: usize,
+    //
+    // // file dimensions so that it calculate the number of squares
+    // sourceFileWidth: usize,
+    // sourceFileHeight: usize,
 
     pub fn init(path: []const u8) !Sprite {
         var buf: [256]u8 = undefined;
