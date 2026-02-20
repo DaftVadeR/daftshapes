@@ -1,5 +1,6 @@
 const rl = @import("raylib");
 const std = @import("std");
+const game = @import("game.zig");
 
 fn drawLevel(level: Level) !void {
     var x: usize = 0;

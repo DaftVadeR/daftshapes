@@ -40,6 +40,14 @@
             .url = "git+https://github.com/emscripten-core/emsdk?ref=4.0.9#3bcf1dcd01f040f370e10fe673a092d9ed79ebb5",
             .hash = "N-V-__8AAJl1DwBezhYo_VE6f53mPVm00R-Fk28NPW7P14EQ",
         },
+        .zlm = .{
+            .url = "git+https://github.com/ziglibs/zlm/?ref=HEAD#35ab7df57cfb5392a11486f6e4b03a82f849a118",
+            .hash = "zlm-0.1.0-LoZ6yDawAADMopilIe9MDzer0UqmruCy_PuhNv4OMc7c",
+        },
+        .thing = .{
+            .url = "git+https://github.com/thi-ng/zig-thing/?ref=HEAD#ab8566baf6f413abc29ca9ced222189bdb1f455e",
+            .hash = "thing-0.3.0-Qh1YqHmDAQDFT0fckPncYMcxH4on0PzUHCsVptJL4Q2h",
+        },
     },
     .paths = .{
         "build.zig",

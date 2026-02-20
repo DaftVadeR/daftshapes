@@ -38,9 +38,9 @@ pub fn main() anyerror!void {
 
     const allocator = arena.allocator();
 
-    // const ptr = try allocator.create(i32);
-
     var g = try game.Game.init(allocator);
+
+    // load assets simply for now
 
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
         g.update();
