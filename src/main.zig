@@ -3,6 +3,7 @@
 const rl = @import("raylib");
 const std = @import("std");
 const game = @import("game.zig");
+const common = @import("common.zig");
 
 // fn getRandomTextureSquare(_: usize) TextureSquare {
 //     return TextureSquare{
@@ -10,22 +11,18 @@ const game = @import("game.zig");
 //     };
 // }
 
-const desiredScreenWidth: i32 = 1280;
-const desiredScreenHeight: i32 = 720;
-
 pub fn main() anyerror!void {
     // Initialization
     //--------------------------------------------------------------------------------------
-
-    rl.initWindow(desiredScreenWidth, desiredScreenHeight, "Fearsome Shapes");
+    rl.initWindow(common.desiredScreenWidth, common.desiredScreenHeight, "Fearsome Shapes");
 
     const monitor: i32 = rl.getCurrentMonitor();
 
     const monitorWidth: i32 = rl.getMonitorWidth(monitor);
     const monitorHeight: i32 = rl.getMonitorHeight(monitor);
 
-    const posX: i32 = @divTrunc(monitorWidth, 2) - @divTrunc(desiredScreenWidth, 2);
-    const posY: i32 = @divTrunc(monitorHeight, 2) - @divTrunc(desiredScreenHeight, 2);
+    const posX: i32 = @divTrunc(monitorWidth, 2) - @divTrunc(common.desiredScreenWidth, 2);
+    const posY: i32 = @divTrunc(monitorHeight, 2) - @divTrunc(common.desiredScreenHeight, 2);
 
     rl.setWindowPosition(posX, posY);
 
@@ -51,7 +48,7 @@ pub fn main() anyerror!void {
 
         rl.clearBackground(.black);
 
-        g.draw();
+        try g.draw();
 
         //----------------------------------------------------------------------------------
     }

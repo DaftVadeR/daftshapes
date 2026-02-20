@@ -1,6 +1,7 @@
 const std = @import("std");
 const rl = @import("raylib");
 const game = @import("game.zig");
+const common = @import("common.zig");
 
 // ui_camera :: proc() -> rl.Camera2D {
 // return {zoom = f32(rl.GetScreenHeight()) / common.PIXEL_WINDOW_HEIGHT}
@@ -25,30 +26,54 @@ const menu_labels = [_]MenuLabel{
 };
 
 pub const Menu = struct {
-    selected_option: u32,
+    selected_option: usize,
     startGame: *const fn (g: *game.Game) void,
+
+    pub fn draw(self: Menu) !void {
+        for (menu_labels, 0..) |item, index| {
+            var buf: [256]u8 = undefined;
+            const menu_name_z = try std.fmt.bufPrintZ(&buf, "{s}", .{item.label});
+            const index_int: i32 = @intCast(index);
+
+            var color = rl.Color.ray_white;
+
+            if (self.selected_option == index_int) {
+                color = rl.Color.gold;
+            }
+
+            rl.drawText(menu_name_z, common.desiredScreenWidth / 2 - 20, 20 * (index_int + 1), 8, color);
+        }
+    }
 
     pub fn update(self: *Menu, g: *game.Game) void {
         if (rl.isKeyPressed(rl.KeyboardKey.up)) {
-            self.selected_option -= 1;
+            if (self.selected_option > 0) {
+                self.selected_option -= 1;
+            } else {
+                self.selected_option = menu_labels.len - 1;
+            }
         } else if (rl.isKeyPressed(rl.KeyboardKey.down)) {
-            self.selected_option += 1;
+            if (self.selected_option < menu_labels.len - 1) {
+                self.selected_option += 1;
+            } else {
+                self.selected_option = 0;
+            }
         }
 
-        if (self.selected_option < 0) {
-            self.selected_option = menu_labels.len - 1;
-        } else if (self.selected_option >= menu_labels.len) {
-            self.selected_option = 0;
-        }
-
-        if (rl.isKeyPressed(rl.KeyboardKey.enter)) {
+        if (rl.isKeyDown(rl.KeyboardKey.enter)) {
             const selected_menu_option = menu_labels[self.selected_option].option;
 
             switch (selected_menu_option) {
                 .Start => {
+                    std.debug.print("Starting game...\n", .{});
+
                     self.startGame(g);
                 },
                 .Quit => {
+                    std.debug.print("Quitting game...\n", .{});
+
+                    std.posix.exit(0);
+
                     rl.closeWindow();
                 },
             }
@@ -90,12 +115,3 @@ pub const Menu = struct {
 //
 
 //
-// render_menu :: proc() {
-//  rl.BeginMode2D(ui_camera())
-//  // NOTE: `fmt.ctprintf` uses the temp allocator. The temp allocator is
-//  // cleared at the end of the frame by the main application, meaning inside
-//  // `main_hot_reload.odin`, `main_release.odin` or `main_web_entry.odin`.
-//  for item, index in menu_labels {
-//      rl.DrawText(fmt.ctprintf(item.label), common.PIXEL_WINDOW_WIDTH / 2 - 20, cast(i32)(20 * (index + 1)), 8, rl.WHITE)
-//  }
-// }
