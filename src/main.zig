@@ -26,8 +26,6 @@ pub fn main() anyerror!void {
 
     rl.setWindowPosition(posX, posY);
 
-    defer rl.closeWindow(); // Close window and OpenGL context
-
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     var dba: std.heap.DebugAllocator(.{}) = .init;
@@ -42,10 +40,19 @@ pub fn main() anyerror!void {
 
     var g = try game.Game.init(allocatorBase);
 
+    defer g.deinit();
+
+    var closed_manually: bool = false;
+
     // load assets simply for now
 
     while (!rl.windowShouldClose()) { // Detect window close button or ESC key
         g.update();
+
+        if (rl.windowShouldClose()) {
+            closed_manually = true;
+            break;
+        }
 
         rl.beginDrawing();
 
@@ -56,5 +63,9 @@ pub fn main() anyerror!void {
         try g.draw();
 
         //----------------------------------------------------------------------------------
+    }
+
+    if (!closed_manually) {
+        rl.closeWindow(); // Close window and OpenGL context
     }
 }

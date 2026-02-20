@@ -7,6 +7,7 @@ const common = @import("common.zig");
 // return {zoom = f32(rl.GetScreenHeight()) / common.PIXEL_WINDOW_HEIGHT}
 //
 // }
+//
 
 const MenuOption = enum {
     Start,
@@ -30,48 +31,8 @@ pub const Menu = struct {
     startGame: *const fn (g: *game.Game) void,
 
     pub fn draw(self: Menu) !void {
-        for (menu_labels, 0..) |item, index| {
-            var buf: [256]u8 = undefined;
-            const menu_name_z = try std.fmt.bufPrintZ(&buf, "{s}", .{item.label});
-            const index_int: i32 = @intCast(index);
-
-            var color = rl.Color.ray_white;
-
-            if (self.selected_option == index_int) {
-                color = rl.Color.gold;
-            }
-
-            const increment: i32 = 50;
-            const font_size: i32 = 100;
-
-            const text_dimensions = rl.measureTextEx(
-                try rl.getFontDefault(),
-                menu_name_z,
-                font_size,
-                0,
-            );
-
-            const text_dimensions_x_i32: i32 = @intFromFloat(text_dimensions.x);
-            const text_dimensions_y_i32: i32 = @intFromFloat(text_dimensions.y);
-
-            const half_x: i32 = @intFromFloat(@divTrunc(text_dimensions.x, 2));
-
-            std.debug.print("text_dimensions: {d}, {d}\n", .{ text_dimensions_x_i32, text_dimensions_y_i32 });
-
-            const length: i32 = @intCast(menu_labels.len);
-            const height_of_all_text: i32 = @intCast((increment * index_int) + (text_dimensions_y_i32 * length));
-
-            // const line_pos_y: i32 = height_of_all_text;
-            const y = common.desiredScreenHeight / 2 - @divTrunc(height_of_all_text, 2) + (increment * index_int) + ((index_int) * text_dimensions_y_i32);
-
-            rl.drawText(
-                menu_name_z,
-                @intCast(common.desiredScreenWidth / 2 - half_x),
-                @intCast(y),
-                font_size,
-                color,
-            );
-        }
+        self.draw_bg();
+        try self.draw_menu_items();
     }
 
     pub fn update(self: *Menu, g: *game.Game) void {
@@ -96,17 +57,59 @@ pub const Menu = struct {
             switch (selected_menu_option) {
                 .Start => {
                     std.debug.print("Starting game...\n", .{});
-
                     self.startGame(g);
                 },
                 .Quit => {
                     std.debug.print("Quitting game...\n", .{});
-
-                    std.posix.exit(0);
-
                     rl.closeWindow();
                 },
             }
+        }
+    }
+
+    fn draw_bg(_: Menu) void {
+        rl.clearBackground(rl.Color.dark_gray);
+    }
+
+    fn draw_menu_items(self: Menu) !void {
+        for (menu_labels, 0..) |item, index| {
+            var buf: [256]u8 = undefined;
+            const menu_name_z = try std.fmt.bufPrintZ(&buf, "{s}", .{item.label});
+            const index_int: i32 = @intCast(index);
+
+            var color = rl.Color.ray_white;
+
+            if (self.selected_option == index_int) {
+                color = rl.Color.gold;
+            }
+
+            const increment: i32 = 50;
+            const font_size: i32 = 100;
+
+            const text_dimensions = rl.measureTextEx(
+                try rl.getFontDefault(),
+                menu_name_z,
+                font_size,
+                0,
+            );
+
+            const text_dimensions_y_i32: i32 = @intFromFloat(text_dimensions.y);
+
+            const half_x: i32 = @intFromFloat(@divTrunc(text_dimensions.x, 2));
+
+            const length: i32 = @intCast(menu_labels.len);
+            const height_of_all_text: i32 = @intCast((increment * index_int) + (text_dimensions_y_i32 * length));
+
+            // const line_pos_y: i32 = height_of_all_text;
+            const y = common.desiredScreenHeight / 2 - @divTrunc(height_of_all_text, 2) + (increment * index_int) + ((index_int) * text_dimensions_y_i32);
+
+            rl.drawText(
+                menu_name_z,
+                @intCast(common.desiredScreenWidth / 2 - half_x),
+                @intCast(y),
+                font_size,
+                color,
+            );
         }
     }
 };
