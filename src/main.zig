@@ -5,12 +5,6 @@ const std = @import("std");
 const game = @import("game.zig");
 const common = @import("common.zig");
 
-// fn getRandomTextureSquare(_: usize) TextureSquare {
-//     return TextureSquare{
-//         .id = 0, //testing
-//     };
-// }
-
 pub fn main() anyerror!void {
     // Initialization
     //--------------------------------------------------------------------------------------
@@ -23,6 +17,8 @@ pub fn main() anyerror!void {
 
     const posX: i32 = @divTrunc(monitorWidth, 2) - @divTrunc(common.desiredScreenWidth, 2);
     const posY: i32 = @divTrunc(monitorHeight, 2) - @divTrunc(common.desiredScreenHeight, 2);
+
+    rl.setExitKey(rl.KeyboardKey.slash);
 
     rl.setWindowPosition(posX, posY);
 
@@ -42,15 +38,13 @@ pub fn main() anyerror!void {
 
     defer g.deinit();
 
-    var closed_manually: bool = false;
+    var closed_ingame: bool = false;
 
-    // load assets simply for now
-
-    while (!rl.windowShouldClose()) { // Detect window close button or ESC key
+    while (!rl.windowShouldClose()) { // detect external close requests
         g.update();
 
-        if (rl.windowShouldClose()) {
-            closed_manually = true;
+        if (rl.windowShouldClose()) { // detect in-game close requests
+            closed_ingame = true;
             break;
         }
 
@@ -61,11 +55,9 @@ pub fn main() anyerror!void {
         rl.clearBackground(.black);
 
         try g.draw();
-
-        //----------------------------------------------------------------------------------
     }
 
-    if (!closed_manually) {
-        rl.closeWindow(); // Close window and OpenGL context
+    if (!closed_ingame) { // if closed externally (window closed, raylib escape key, alt F4 etc.)
+        rl.closeWindow();
     }
 }

@@ -9,15 +9,26 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
+
     const raylib = raylib_dep.module("raylib");
     const raylib_artifact = raylib_dep.artifact("raylib");
+
+    const thing_dep = b.dependency("thing", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const thing = thing_dep.module("thing");
+    // const thing_artifact = thing_dep.artifact("thing");
 
     const exe_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
+
     exe_mod.addImport("raylib", raylib);
+    exe_mod.addImport("thing", thing);
 
     const run_step = b.step("run", "Run the app");
 

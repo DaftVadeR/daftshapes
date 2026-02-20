@@ -33,6 +33,7 @@ pub const Game = struct {
         };
 
         self.menu.startGame = &Game.start;
+        self.gameplay.exitToMenu = &Game.exitToMenu;
 
         // init child resources here, e.g:
         // self.player = try Player.init(allocator);
@@ -40,8 +41,14 @@ pub const Game = struct {
     }
 
     pub fn start(self: *Game) void {
-        self.gameplay = gameplay.GamePlay.init() catch unreachable;
+        self.gameplay = gameplay.GamePlay.init(&Game.exitToMenu) catch unreachable;
         self.state = .Play;
+    }
+
+    pub fn exitToMenu(self: *Game) void {
+        // self.gameplay.deinit();
+
+        self.state = .Menu;
     }
 
     pub fn deinit(self: *Game) void {
@@ -64,7 +71,7 @@ pub const Game = struct {
         if (self.state == .Menu) {
             self.menu.update(self);
         } else if (self.state == .Play) {
-            // self.gameplay.update();
+            self.gameplay.update(self);
         }
     }
 };

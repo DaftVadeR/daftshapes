@@ -1,6 +1,7 @@
 const std = @import("std");
 const rl = @import("raylib");
-const zlm = @import("zlm");
+const thing = @import("thing");
+const vec2 = thing.vectors.vec2;
 const game = @import("game.zig");
 const character = @import("character.zig");
 const weapon = @import("weapon.zig");
@@ -78,32 +79,33 @@ pub const Player = struct {
     // }
 
     pub fn update(self: *Player) void {
-        var newInput: rl.Vector2 = rl.Vector2{
-            .x = 0,
-            .y = 0,
-        };
+        var inputDir: vec2.V = vec2.ZERO;
 
-        const frameTime = rl.GetFrameTime();
-        const playerAttributes = self.player_detail.attributes;
+        const frameTime = rl.getFrameTime();
+        const speed = self.player_detail.attributes.speed;
 
-        // update translation
-        if (rl.IsKeyDown(.UP) || rl.IsKeyDown(.W)) {
-            newInput.y -= playerAttributes.speed;
+        // collect raw direction input (-1/+1 per axis)
+        if (rl.isKeyDown(.up) or rl.isKeyDown(.w)) {
+            inputDir[1] -= 1;
         }
 
-        if (rl.IsKeyDown(.DOWN) || rl.IsKeyDown(.S)) {
-            newInput.y += playerAttributes.speed;
+        if (rl.isKeyDown(.down) or rl.isKeyDown(.s)) {
+            inputDir[1] += 1;
         }
 
-        if (rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A)) {
-            newInput.x -= playerAttributes.speed;
+        if (rl.isKeyDown(.left) or rl.isKeyDown(.a)) {
+            inputDir[0] -= 1;
         }
 
-        if (rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D)) {
-            newInput.x += playerAttributes.speed;
+        if (rl.isKeyDown(.right) or rl.isKeyDown(.d)) {
+            inputDir[0] += 1;
         }
 
-        // input = linalg.normalize0(input);
-        self.player_pos += newInput * frameTime;
+        // normalize so diagonal movement isnt faster than cardinal
+        const normalized = vec2.normalize(inputDir);
+        const movement = vec2.mulN(normalized, speed * frameTime);
+
+        self.player_detail.sprite.position.x += movement[0];
+        self.player_detail.sprite.position.y += movement[1];
     }
 };

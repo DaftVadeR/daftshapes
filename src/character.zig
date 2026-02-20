@@ -9,10 +9,10 @@ const weapon = @import("weapon.zig");
 //
 
 // applies to player and enemy characters for simplicity sake
-pub const CharacterAttributes = struct {
-    strength: u32,
-    magic: u32,
-    speed: u32,
-    attack_speed: u32,
+pub const CharacterAttributes = struct { // u31 to match up with i32
+    strength: f32,
+    magic: f32,
+    speed: f32,
+    attack_speed: f32,
     default_weapons: [1]weapon.Weapon,
 };
