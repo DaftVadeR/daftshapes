@@ -35,7 +35,7 @@ pub const GamePlay = struct {
                 // target is the world position the camera looks at (player position)
                 .target = p.player_detail.attributes.position,
                 .rotation = 0,
-                .zoom = 5,
+                .zoom = 1,
             },
         };
     }

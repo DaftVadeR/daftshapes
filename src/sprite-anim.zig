@@ -11,7 +11,8 @@ pub const SpriteAnim = struct {
     frameH: f32,
     cols: usize,
     totalFrames: usize,
-    fps: f32 = 12.0,
+    startFrame: usize = 0,
+    fps: f32 = 2.0,
     currentFrame: usize = 0,
     timer: f32 = 0.0,
     path: [:0]u8,
@@ -23,6 +24,7 @@ pub const SpriteAnim = struct {
         cols: usize,
         totalFrames: usize,
         fps: f32,
+        startFrame: usize,
     ) !SpriteAnim {
         var buf: [256]u8 = undefined;
         const path_z = try std.fmt.bufPrintZ(&buf, "{s}", .{path});
@@ -34,7 +36,7 @@ pub const SpriteAnim = struct {
             .cols = cols,
             .totalFrames = totalFrames,
             .fps = fps,
-
+            .startFrame = startFrame,
             .texture = try rl.Texture.init(path_z), // Texture loading
         };
     }

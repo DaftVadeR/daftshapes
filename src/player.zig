@@ -47,7 +47,7 @@ pub const PlayerClass = struct {
 // }
 
 pub fn getKnight(allocator: std.mem.Allocator) !PlayerClass {
-    var anims = try allocator.alloc(sprite.SpriteAnim, 1);
+    var anims = try allocator.alloc(sprite.SpriteAnim, 2);
 
     var weapons = try allocator.alloc(weapon.Weapon, 1);
 
@@ -56,8 +56,19 @@ pub fn getKnight(allocator: std.mem.Allocator) !PlayerClass {
         16,
         16,
         6,
-        12,
+        6,
+        10,
+        0,
+    );
+
+    anims[1] = try sprite.SpriteAnim.init(
+        "resources/images/player/knight_spritesheet.png",
+        16,
+        16,
+        6,
+        6,
         1,
+        6,
     );
 
     weapons[0] = weapon.energyWeapon;
@@ -172,11 +183,19 @@ pub const Player = struct {
             inputDir[0] += 1;
         }
 
+        if (inputDir[0] == 0 and inputDir[1] == 0) {
+            self.player_detail.attributes.default_anim = 0; // idle
+        } else {
+            self.player_detail.attributes.default_anim = 1; // run
+        }
+
         // normalize so diagonal movement isnt faster than cardinal
         const normalized = vec2.normalize(inputDir);
         const movement = vec2.mulN(normalized, speed * frameTime);
 
         self.player_detail.attributes.position.x += movement[0];
         self.player_detail.attributes.position.y += movement[1];
+
+        self.player_detail.attributes.anims[self.player_detail.attributes.default_anim].update(frameTime);
     }
 };
