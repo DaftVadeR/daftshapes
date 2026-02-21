@@ -7,9 +7,11 @@ const sprite = @import("sprite.zig");
 const weapon = @import("weapon.zig");
 const game = @import("game.zig");
 const common = @import("common.zig");
+const enemy = @import("enemy.zig");
 
 pub const GamePlay = struct {
     player: player.Player,
+    enemies: []enemy.Enemy,
     camera: rl.Camera2D,
     allocator: std.mem.Allocator,
     exitToMenu: *const fn (g: *game.Game) void,
@@ -19,10 +21,13 @@ pub const GamePlay = struct {
         g: *game.Game,
         exitToMenu: *const fn (g: *game.Game) void,
     ) !GamePlay {
-        // uses allocator for weapons
         const p = try player.Player.init(g.allocator);
 
+        const enemies = try allocator.alloc(enemy.Enemy, 1);
+        enemies[0] = try enemy.Shape.init(allocator, .Triangle, p);
+
         return GamePlay{
+            .enemies = enemies,
             .allocator = allocator,
             .player = p,
             .exitToMenu = exitToMenu,
@@ -49,30 +54,40 @@ pub const GamePlay = struct {
 
         defer self.camera.end();
 
-        // // draw a ground grid as a visual reference for movement
-        // const gridSize: i32 = 64;
-        // const gridCount: i32 = 20;
-        // const halfGrid: i32 = gridCount * gridSize / 2;
-        // var i: i32 = 0;
-        // while (i <= gridCount) : (i += 1) {
-        //     const pos = -halfGrid + i * gridSize;
-        //     // vertical lines
-        //     rl.drawLine(pos, -halfGrid, pos, halfGrid, rl.Color.dark_gray);
-        //     // horizontal lines
-        //     rl.drawLine(-halfGrid, pos, halfGrid, pos, rl.Color.dark_gray);
-        // }
+        // draw a ground grid as a visual reference for movement
+        const gridSize: i32 = 128;
+        const gridCount: i32 = 24;
 
-        self.player.draw();
-    }
+        const halfGrid: i32 = gridCount * gridSize / 2;
 
-    pub fn update(self: *GamePlay, g: *game.Game) void {
-        if (rl.isKeyPressed(rl.KeyboardKey.escape)) {
-            std.debug.print("back to menu...\n", .{});
-            self.exitToMenu(g);
-            return;
+        var i: i32 = 0;
+        while (i <= gridCount) : (i += 1) {
+            const pos = -halfGrid + i * gridSize;
+            // vertical lines
+            rl.drawLine(pos, -halfGrid, pos, halfGrid, rl.Color.dark_gray);
+            // horizontal lines
+            rl.drawLine(-halfGrid, pos, halfGrid, pos, rl.Color.dark_gray);
         }
 
+        self.player.draw();
+
+        for (self.enemies) |enem| {
+            enem.draw();
+        }
+    }
+
+    pub fn update(self: *GamePlay, _: *game.Game) void {
+        // if (rl.isKeyPressed(rl.KeyboardKey.escape)) {
+        //     std.debug.print("back to menu...\n", .{});
+        //     self.exitToMenu(g);
+        //     return;
+        // }
+
         self.player.update();
+
+        for (self.enemies) |*enem| {
+            enem.update();
+        }
 
         // keep camera following the player
         self.camera.target = self.player.player_detail.attributes.position;

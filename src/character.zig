@@ -19,11 +19,11 @@ pub const CharacterAttributes = struct {
 
     default_weapons: []weapon.Weapon,
     transform: rl.Vector2,
-    anims: []sprite.SpriteAnim,
+    anims: ?[]sprite.SpriteAnim,
 
     pub fn init(
         allocator: std.mem.Allocator,
-        anims: []sprite.SpriteAnim,
+        anims: ?[]sprite.SpriteAnim,
         weapons: []weapon.Weapon,
     ) CharacterAttributes {
         return CharacterAttributes{
@@ -39,7 +39,7 @@ pub const CharacterAttributes = struct {
 
             // set via init
             .default_weapons = weapons,
-            .transform = rl.Vector2{ .x = 0, .y = 0 },
+            .transform = rl.Vector2{ .x = 1, .y = 0 },
             .anims = anims,
         };
     }
@@ -47,11 +47,14 @@ pub const CharacterAttributes = struct {
     pub fn deinit(self: CharacterAttributes) void {
         std.debug.print("Deinitializing CharacterAttributes...\n", .{});
 
-        for (self.anims) |*anim| {
-            anim.denit();
+        if (self.anims) |anims| {
+            for (anims) |*anim| {
+                anim.denit();
+            }
+
+            self.allocator.free(anims);
         }
 
-        self.allocator.free(self.anims);
         self.allocator.free(self.default_weapons);
 
         // for (self.default_weapons) |*weapon| {
@@ -60,8 +63,10 @@ pub const CharacterAttributes = struct {
     }
 
     pub fn switchAnim(self: CharacterAttributes, animIndex: usize) void {
-        if (animIndex < self.anims.len) {
-            self.default_anim = animIndex;
+        if (self.anims) |anims| {
+            if (animIndex < anims.len) {
+                self.default_anim = animIndex;
+            }
         }
     }
 };

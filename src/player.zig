@@ -67,7 +67,7 @@ pub fn getKnight(allocator: std.mem.Allocator) !PlayerClass {
         16,
         6,
         6,
-        1,
+        10,
         6,
     );
 
@@ -131,11 +131,16 @@ pub const Player = struct {
     // }
 
     pub fn draw(self: Player) void {
-        self.player_detail.attributes.anims[self.player_detail.attributes.default_anim].draw(
-            self.player_detail.attributes.position,
-            5.0,
-            rl.Color.white,
-        );
+        const attrs = self.player_detail.attributes;
+
+        if (attrs.anims) |anims| {
+            anims[attrs.default_anim].draw(
+                attrs.position,
+                5.0,
+                attrs.transform.x,
+                rl.Color.white,
+            );
+        }
 
         // const spr = self.player_detail.attributes.sprite;
         // // draw first frame (16x16) of the spritesheet at the sprite position
@@ -183,6 +188,14 @@ pub const Player = struct {
             inputDir[0] += 1;
         }
 
+        // update facing direction based on horizontal input
+        if (inputDir[0] < 0) {
+            self.player_detail.attributes.transform.x = -1;
+        } else if (inputDir[0] > 0) {
+            self.player_detail.attributes.transform.x = 1;
+        }
+        // if no horizontal input, keep the last facing direction
+
         if (inputDir[0] == 0 and inputDir[1] == 0) {
             self.player_detail.attributes.default_anim = 0; // idle
         } else {
@@ -196,6 +209,8 @@ pub const Player = struct {
         self.player_detail.attributes.position.x += movement[0];
         self.player_detail.attributes.position.y += movement[1];
 
-        self.player_detail.attributes.anims[self.player_detail.attributes.default_anim].update(frameTime);
+        if (self.player_detail.attributes.anims) |anims| {
+            anims[self.player_detail.attributes.default_anim].update(frameTime);
+        }
     }
 };

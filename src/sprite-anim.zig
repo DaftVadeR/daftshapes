@@ -54,23 +54,35 @@ pub const SpriteAnim = struct {
         }
     }
 
-    pub fn draw(self: SpriteAnim, pos: rl.Vector2, scale: f32, tint: rl.Color) void {
-        const col = self.currentFrame % self.cols;
-        const row = self.currentFrame / self.cols;
+    pub fn draw(self: SpriteAnim, pos: rl.Vector2, scale: f32, facingX: f32, tint: rl.Color) void {
+        // offset currentFrame by startFrame to index into the correct row/region
+        const frame = self.startFrame + self.currentFrame;
+        const col = frame % self.cols;
+        const row = frame / self.cols;
+
+        // negate src width to flip horizontally when facing left
+        const srcWidth = if (facingX < 0) -self.frameW else self.frameW;
+
         const src = rl.Rectangle{
             .x = @as(f32, @floatFromInt(col)) * self.frameW,
             .y = @as(f32, @floatFromInt(row)) * self.frameH,
-            .width = self.frameW,
+            .width = srcWidth,
             .height = self.frameH,
         };
+
+        const scaledW = self.frameW * scale;
+        const scaledH = self.frameH * scale;
 
         const dest = rl.Rectangle{
             .x = pos.x,
             .y = pos.y,
-            .width = self.frameW * scale,
-            .height = self.frameH * scale,
+            .width = scaledW,
+            .height = scaledH,
         };
 
-        rl.drawTexturePro(self.texture, src, dest, rl.Vector2{ .x = 0, .y = 0 }, 0, tint);
+        // origin at center of scaled sprite so it draws centered on pos
+        const origin = rl.Vector2{ .x = scaledW / 2.0, .y = scaledH / 2.0 };
+
+        rl.drawTexturePro(self.texture, src, dest, origin, 0, tint);
     }
 };
